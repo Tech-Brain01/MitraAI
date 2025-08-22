@@ -1,6 +1,6 @@
 import './App.css';
 import Sidebar from './Sidebar.jsx';
-import ChatWindow from './Chatwindow.jsx';
+import Chatwindow from './Chatwindow.jsx';
 import { Mycontext } from './MyContext.jsx';
 import { use, useState } from 'react';
 import { v1 as uuidv1} from 'uuid';
@@ -27,7 +27,7 @@ function App() {
     <div className="app">
       <Mycontext.Provider value={providerValues}>
       <Sidebar />
-      <ChatWindow />
+      <Chatwindow />
       </Mycontext.Provider>
     </div>
   );

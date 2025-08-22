@@ -1,10 +1,10 @@
 import Chat from "./Chat";
-import "./ChatWindow.css";
+import "./Chatwindow.css";
 import { Mycontext } from "./MyContext.jsx";
 import { useContext , useState , useEffect } from "react";
 import {ScaleLoader} from "react-spinners";
 
-function ChatWindow() {
+function Chatwindow() {
   const { prompt, setPrompt, reply, setReply , currThreadId , prevChats , setPrevChats , setNewChat } = useContext(Mycontext);
   const [loading, setLoading] = useState(false);
 
@@ -86,4 +86,4 @@ function ChatWindow() {
   );
 }
 
-export default ChatWindow;
+export default Chatwindow;

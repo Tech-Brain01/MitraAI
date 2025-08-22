@@ -2,6 +2,7 @@ import "./Sidebar.css";
 import { useContext , useEffect } from "react";
 import { Mycontext } from "./MyContext.jsx";
 import { v1 as uuidv1 } from 'uuid';
+import logo from './assets/logo.png';
 
 function Sidebar() {
   const { allThreads, setAllThreads,  currThreadId , setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats } = useContext(Mycontext);
@@ -54,7 +55,7 @@ function Sidebar() {
 
       {/* new chat button */}
       <button onClick={createNewChat}>
-          <img className="logo" src = "src/assets/logo.png" alt="MitraAI logo" ></img>
+          <img className="logo" src={logo} alt="MitraAI logo" ></img>
           <span><i className="fa-solid fa-pen-to-square"></i></span>
       </button>
 
