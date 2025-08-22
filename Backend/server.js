@@ -7,8 +7,14 @@ import chatRoutes from "./routes/chat.js";
 const app = express();
 const PORT = 8080;
 
+const corsOptions = {
+  origin: process.env.FRONTEND_URL, 
+  optionsSuccessStatus: 200 
+};
+
+
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use("/api", chatRoutes);
 
