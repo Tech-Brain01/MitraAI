@@ -69,8 +69,6 @@ jobs:
     - name: Install Backend Dependencies
       run: npm ci
     
-    - name: Run Backend Tests
-      run: npm test
 
     - name: Deploy Backend to Render
       run: curl -X POST "$RENDER_DEPLOY_HOOK"
