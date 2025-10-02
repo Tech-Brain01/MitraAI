@@ -7,14 +7,23 @@ import chatRoutes from "./routes/chat.js";
 const app = express();
 const PORT = 8080;
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,   // production frontend
+  "http://localhost:5173"     // local dev frontend
+];
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL, 
-  optionsSuccessStatus: 200 
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
 };
 
-
-app.use(express.json());
 app.use(cors(corsOptions));
+app.use(express.json());
 
 app.use("/api", chatRoutes);
 
