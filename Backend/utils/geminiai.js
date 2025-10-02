@@ -121,7 +121,7 @@ export const getGeminiAPIResponseWithFallback = async (userPrompt) => {
           const role = content.role === 'model' ? 'assistant' : content.role;
           const text = content.parts[0].text;
           
-          console.log(`Successfully used model: ${model}`);
+          // console.log(`Successfully used model: ${model}`);
           return {
             role: role,
             text: text
@@ -129,16 +129,15 @@ export const getGeminiAPIResponseWithFallback = async (userPrompt) => {
         }
       } else {
         const errorData = await response.json();
-        console.error(`Model ${model} failed:`, errorData.error?.message);
-        continue; // Try next model
+        // console.error(`Model ${model} failed:`, errorData.error?.message);
+        continue;
       }
     } catch (err) {
-      console.error(`Error with model ${model}:`, err.message);
-      continue; // Try next model
+      // console.error(`Error with model ${model}:`, err.message);
+      continue; 
     }
   }
   
-  // If all models fail, return error message
   return {
     role: 'assistant',
     text: 'Sorry, I encountered an error processing your request. Please try again later.'

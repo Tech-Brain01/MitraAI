@@ -89,7 +89,7 @@ router.post("/chat", async (req, res) => {
     }
 
     const assistantReply = await getGeminiAPIResponseWithFallback(message);
-     console.log("Gemini Response:", assistantReply);
+    //  console.log("Gemini Response:", assistantReply);
 
     thread.messages.push({ role: "assistant", content: assistantReply.text });
 
