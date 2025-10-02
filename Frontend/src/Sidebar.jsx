@@ -24,6 +24,7 @@ function Sidebar() {
 
   useEffect(() => {
     getAllThreads();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currThreadId]);
 
   const createNewChat = () => {
@@ -66,7 +67,7 @@ function Sidebar() {
             {
                allThreads?.map((thread, idx) => (
                  <li key={idx}
-                  onClick={(e) => changeThread(thread.threadId)}
+                  onClick={() => changeThread(thread.threadId)}
                  > {thread.title} </li>
                ))
             }

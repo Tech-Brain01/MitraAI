@@ -2,7 +2,7 @@ import './App.css';
 import Sidebar from './Sidebar.jsx';
 import Chatwindow from './Chatwindow.jsx';
 import { Mycontext } from './MyContext.jsx';
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { v1 as uuidv1} from 'uuid';
 
 function App() {

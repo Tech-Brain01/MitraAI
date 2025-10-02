@@ -11,7 +11,6 @@ function Chatwindow() {
     reply,
     setReply,
     currThreadId,
-    prevChats,
     setPrevChats,
     setNewChat,
   } = useContext(Mycontext);
@@ -47,22 +46,16 @@ function Chatwindow() {
   };
 
   useEffect(() => {
-    if (prompt && reply) {
-      setPrevChats((prevChats) => [
-        ...prevChats,
-        {
-          role: "user",
-          content: prompt,
-        },
-        {
-          role: "assistant",
-          content: reply,
-        },
-      ]);
-    }
-
+  if (prompt && reply) {
+    setPrevChats((prevChats) => [
+      ...prevChats,
+      { role: "user", content: prompt },
+      { role: "assistant", content: reply },
+    ]);
     setPrompt("");
-  }, [reply]);
+  }
+}, [reply, prompt, setPrevChats, setPrompt]);
+
 
   return (
     // Add flex-1 to make this component grow and fill available space
