@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 import Thread from "../models/Thread.js";
-import getGeminiAPIResponse from "../utils/geminiai.js";
+import { getGeminiAPIResponseWithFallback } from "../utils/geminiai.js";
 
 router.post("/test", async (req, res) => {
   try {
@@ -88,7 +88,8 @@ router.post("/chat", async (req, res) => {
       thread.messages.push({ role: "user", content: message });
     }
 
-    const assistantReply = await getGeminiAPIResponse(message);
+    const assistantReply = await getGeminiAPIResponseWithFallback(message);
+     console.log("Gemini Response:", assistantReply);
 
     thread.messages.push({ role: "assistant", content: assistantReply.text });
 
@@ -97,11 +98,33 @@ router.post("/chat", async (req, res) => {
     await thread.save();
     res.json({ reply: assistantReply.text });
   } catch (error) {
-    console.log("error occurred", error);
+       console.error("Detailed error:", error);
     res
       .status(500)
       .json({ error: "An error occurred while saving the message." });
   }
 });
+
+
+// router.get("/test-models", async (req, res) => {
+//   const apiKey = process.env.GOOGLE_API_KEY;
+//   const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+  
+//   try {
+//     const response = await fetch(url);
+//     const data = await response.json();
+    
+//     const supportedModels = data.models?.filter(model => 
+//       model.supportedGenerationMethods?.includes('generateContent')
+//     ).map(model => model.name);
+    
+//     res.json({ 
+//       availableModels: supportedModels,
+//       total: supportedModels?.length || 0 
+//     });
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 export default router;

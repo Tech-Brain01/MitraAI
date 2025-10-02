@@ -1,14 +1,21 @@
 import Chat from "./Chat";
 import "./Chatwindow.css";
 import { Mycontext } from "./MyContext.jsx";
-import { useContext , useState , useEffect } from "react";
-import {ScaleLoader} from "react-spinners";
+import { useContext, useState, useEffect } from "react";
+import { ScaleLoader } from "react-spinners";
 
 function Chatwindow() {
-  const { prompt, setPrompt, reply, setReply , currThreadId , prevChats , setPrevChats , setNewChat } = useContext(Mycontext);
+  const {
+    prompt,
+    setPrompt,
+    reply,
+    setReply,
+    currThreadId,
+    prevChats,
+    setPrevChats,
+    setNewChat,
+  } = useContext(Mycontext);
   const [loading, setLoading] = useState(false);
-
-
 
   const getReply = async () => {
     setLoading(true);
@@ -17,40 +24,44 @@ function Chatwindow() {
     const options = {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body:  JSON.stringify({
+      body: JSON.stringify({
         message: prompt,
-        threadId: currThreadId
-      })
+        threadId: currThreadId,
+      }),
     };
- 
-      try {
-        const response =  await fetch(`${import.meta.env.VITE_API_URL}/chat`, options);
-        const res = await response.json();
-        console.log(res);
-        setReply(res.reply);
-      } catch (error) {
-        console.error("Error fetching chat response:", error);
-      }
-     setLoading(false);
-  }
+
+    // Chatwindow.jsx
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${apiUrl}/chat`, options);
+      const res = await response.json();
+      console.log(res);
+      setReply(res.reply);
+    } catch (error) {
+      console.error("Error fetching chat response:", error);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-     if(prompt && reply) {
-      setPrevChats(prevChats => (
-        [...prevChats,{
+    if (prompt && reply) {
+      setPrevChats((prevChats) => [
+        ...prevChats,
+        {
           role: "user",
-          content: prompt
+          content: prompt,
         },
-      {
-        role: "assistant",
-        content: reply
-      }]
-      ))
-     }
+        {
+          role: "assistant",
+          content: reply,
+        },
+      ]);
+    }
 
-     setPrompt("");
+    setPrompt("");
   }, [reply]);
 
   return (
@@ -67,18 +78,20 @@ function Chatwindow() {
         </div>
       </div>
       <Chat></Chat>
-      <ScaleLoader color="#fff" loading={loading}>
-
-      </ScaleLoader>
+      <ScaleLoader color="#fff" loading={loading}></ScaleLoader>
       <div className="chatInput">
         <div className="inputBox">
           <input
             placeholder="Ask MitraAI"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' ? getReply() : ' '}
+            onKeyDown={(e) => (e.key === "Enter" ? getReply() : " ")}
           ></input>
-          <div id="submit" className="fa-solid fa-paper-plane" onClick={getReply}></div>
+          <div
+            id="submit"
+            className="fa-solid fa-paper-plane"
+            onClick={getReply}
+          ></div>
         </div>
         <p className="info">MitraAI can make mistakes. check Important Info.</p>
       </div>
