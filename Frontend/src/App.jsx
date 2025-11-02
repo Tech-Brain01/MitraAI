@@ -4,6 +4,7 @@ import Chatwindow from './Chatwindow.jsx';
 import { Mycontext } from './MyContext.jsx';
 import { useState } from 'react';
 import { v1 as uuidv1} from 'uuid';
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   const [prompt, setPrompt] = useState("");
@@ -29,6 +30,7 @@ function App() {
       <Sidebar />
       <Chatwindow />
       </Mycontext.Provider>
+      <Analytics />
     </div>
   );
 }
