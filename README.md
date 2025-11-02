@@ -350,22 +350,6 @@ Delete a thread permanently.
 
 ---
 
-## 💡 Pro Tips for Recruiters
-
-**Architecture Highlights**:
-- Check `Backend/utils/geminiai.js` for multi-model fallback logic
-- Review `MyContext.jsx` for state management patterns
-- Note RESTful conventions and error handling in `routes/chat.js`
-- See `index.css` for indigenous design system execution
-
-**Interview Questions**:
-1. How would you implement streaming? (SSE or WebSocket)
-2. How would you add user auth? (Clerk + userId in Thread schema)
-3. How would you optimize bundle size? (Code splitting, lazy loading)
-4. How would you add RAG? (Vector embeddings + MongoDB Atlas Vector Search)
-
----
-
 **Built with 💙 for India | Made for recruiters who value depth**
 
 *Last updated: November 2, 2025*
