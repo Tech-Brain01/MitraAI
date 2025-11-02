@@ -1,5 +1,5 @@
 .chatWindow {
-    background-color: #212121;
+    background-color: var(--bg-900);
     height: 100vh;
     width: 100%;
     display: flex;
@@ -16,6 +16,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: linear-gradient(180deg, rgba(26,94,154,0.12), transparent);
+    border-bottom: 1px solid var(--border);
 }
 
 .navbar span {
@@ -27,7 +29,7 @@
 }
 
 .userIcon {
-    background-color: #339cff;
+    background-color: var(--ashoka-blue);
     height: 25px;
     width: 25px;
     border-radius: 50%;
@@ -35,6 +37,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    box-shadow: var(--shadow-soft);
 }
 
 /* chat input */
@@ -59,19 +62,18 @@
 input {
     width: 100%;
     border: none;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.06);
     padding: 20px;
     font-size: 0.8rem;
-    border-radius: 14px;
-    box-shadow: rgba(0,0,0, 0.05) 0 54px 55px,
-                rgba(0,0,0, 0.05) 0 -12px 30px,
-                rgba(0,0,0, 0.05) 0 4px 6px,
-                rgba(0,0,0, 0.05) 0 12px 3px,
-                rgba(0,0,0, 0.05) 0 -3px 5px,
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid transparent;
 }
 
 input:focus {
     outline: none;
+    border-color: rgba(26,94,154,0.35);
+    box-shadow: 0 0 0 3px rgba(26,94,154,0.15);
 }
 
 #submit {
@@ -84,10 +86,38 @@ input:focus {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--ashoka-blue);
 }
 
 .info {
     font-size: 0.8rem;
     padding: 0.5rem;
-    color: #b4b4b4;
+    color: var(--text-300);
 }
+
+
+.dropdown {
+    position: absolute;
+    top: 4rem;
+    right: 4rem;
+    width: 150px;
+    background-color: #323232;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+    text-align: left;
+    z-index: 1000;
+    box-shadow: 0px 2px 8px rgba(0 , 0 , 0 , 0.1);
+}
+
+.dropdownItem {
+    font-size: 0.9rem;
+    margin: 0.3rem 0rem;
+    padding: 0.5rem 0.2rem;
+    cursor: pointer;
+}
+
+.dropdownItem:hover {
+    background-color: rgba(180,180,180,0.1);
+    border-radius: 6px;
+}
+

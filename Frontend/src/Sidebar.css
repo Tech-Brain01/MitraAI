@@ -1,11 +1,13 @@
 .sidebar {
-    background-color: #171717;
-    color: #b4b4b4;
+    background-color: var(--bg-800);
+    color: var(--text-300);
     height: 100vh;
     width:320px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    box-shadow: var(--shadow-soft);
+    overflow: hidden; /* prevent double scrollbars */
 }
 
 button{
@@ -15,13 +17,14 @@ button{
     margin: 10px;
     padding: 10px;
     border-radius: 5px;
-    background-color: transparent;
-    border: solid 0.5px rgba(255, 255, 255, 0.5);
+    background-color: rgba(255,255,255,0.03);
+    border: solid 0.5px var(--border);
     cursor: pointer;
 }
 
 button:hover {
-    background-color: rgba(180, 180, 180, 0.05);
+    background-color: rgba(26,94,154,0.08);
+    border-color: rgba(26,94,154,0.25);
 }
 
 .logo {
@@ -40,26 +43,65 @@ button span {
     margin: 10px;
     padding: 10px;
     height: 100%;
+    flex: 1 1 auto; /* occupy remaining space */
+    overflow-y: auto; /* scroll only history */
 }
 
 .history li {
     list-style-type: none;
     cursor: pointer;
-    padding: 2px 5px;
+    padding: 6px 8px;
     margin-bottom: 0.3rem;
     font-size: 14px;
     border: solid 10px transparent;
+    border-left: 3px solid transparent;
+    word-break: break-word; /* prevent overflow for long titles */
+    display: flex;
+    align-items: center;
 }
 
 .history li:hover {
-    background-color: rgba(180, 180, 180, 0.05);
-    border-radius: 10px
+    background-color: rgba(255,103,31,0.06);
+    border-radius: 10px;
+    border-left-color: var(--saffron);
 }
+
+
+.history, .history * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.history li, .history li * { cursor: pointer; }
+.history li:focus { outline: none; }
+
 
 .sign {
     padding: 10px;
     margin: 10px;
     font-size: 14px;
     text-align: center;
-    border-top: solid 0.25px rgba(255, 255, 255, 0.5);
+    border-top: solid 0.25px var(--border);
+}
+
+/* Trash icon stays inside the list item, aligned right */
+.history li .fa-trash {
+    opacity: 0;
+    margin-left: auto;
+}
+
+.history li:hover .fa-trash {
+    opacity: 1;
+    color: aliceblue;
+}
+
+.history li .fa-trash:hover {
+    color: red !important;
+}
+
+.highlighted {
+    background-color: rgba(26,94,154,0.15);
+    border-left-color: var(--ashoka-blue);
+    border-radius: 10px;
 }

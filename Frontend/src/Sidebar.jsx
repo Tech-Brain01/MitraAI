@@ -1,30 +1,40 @@
 import "./Sidebar.css";
-import { useContext , useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { Mycontext } from "./MyContext.jsx";
-import { v1 as uuidv1 } from 'uuid';
-import logo from './assets/logo.png';
+import { v1 as uuidv1 } from "uuid";
+import { apiFetch } from "./apiClient";
+import logo from "./assets/logo.png";
+
 
 function Sidebar() {
-  const { allThreads, setAllThreads,  currThreadId , setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats } = useContext(Mycontext);
+  const {
+    allThreads,
+    setAllThreads,
+    currThreadId,
+    setNewChat,
+    setPrompt,
+    setReply,
+    setCurrThreadId,
+    setPrevChats,
+  } = useContext(Mycontext);
 
   const getAllThreads = async () => {
-   try {
-    const apiUrl = import.meta.env.VITE_API_URL;
-    const response = await fetch(`${apiUrl}/thread`);
-      const res = await response.json();
-      const filteredData = res.map(thread => ({threadId: thread.threadId, title: thread.title}));
+    try {
+      const res = await apiFetch("/thread");
+      const filteredData = (res || []).map((thread) => ({
+        threadId: thread.threadId,
+        title: thread.title,
+      }));
       // console.log(filteredData);
       setAllThreads(filteredData);
       // console.log(res);
-
-     } catch (err) {
+    } catch (err) {
       console.log(err);
-     }
-   };
+    }
+  };
 
   useEffect(() => {
     getAllThreads();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currThreadId]);
 
   const createNewChat = () => {
@@ -33,52 +43,78 @@ function Sidebar() {
     setReply(null);
     setCurrThreadId(uuidv1());
     setPrevChats([]);
-  }
+  };
 
-  const changeThread = async(newThreadId) => {
-  setCurrThreadId(newThreadId);
+  const changeThread = async (newThreadId) => {
+    setCurrThreadId(newThreadId);
 
-  try {
-    const apiUrl = import.meta.env.VITE_API_URL;
-    const response = await fetch(`${apiUrl}/thread/${newThreadId}`);
-      const res = await response.json();
-      // console.log(res);   
+    try {
+      const res = await apiFetch(`/thread/${newThreadId}`);
+      // console.log(res);
       setPrevChats(res.messages || []);
       setNewChat(false);
       setReply(null);
-
     } catch (err) {
       console.log(err);
     }
   };
 
+const deleteThread = async (threadId) => {
+  try {
+   const response = await apiFetch(`/thread/${threadId}`, {method: 'DELETE'});
+   const res = await response;
+  //  console.log(res);
+
+  setAllThreads(prev => prev.filter(thread => thread.threadId !== threadId));
+  
+  if (threadId === currThreadId) {
+    createNewChat();
+  }
+
+  } catch (err) {
+     console.error("Error deleting thread:", err);
+  }
+}
+
   return (
     <section className="sidebar">
 
+
       {/* new chat button */}
       <button onClick={createNewChat}>
-          <img className="logo" src={logo} alt="MitraAI logo" ></img>
-          <span><i className="fa-solid fa-pen-to-square"></i></span>
+        <img className="logo" src={logo} alt="MitraAI logo"></img>
+        <span>
+          <i className="fa-solid fa-pen-to-square"></i>
+        </span>
       </button>
 
-        {/* history */}
+      {/* history */}
 
-        <ul className="history">
-            {
-               allThreads?.map((thread, idx) => (
-                 <li key={idx}
-                  onClick={() => changeThread(thread.threadId)}
-                 > {thread.title} </li>
-               ))
-            }
-        </ul>
+      <ul className="history">
+        {allThreads?.map((thread, idx) => (
+          <li key={idx} onClick={() => changeThread(thread.threadId)}
+            className={thread.threadId === currThreadId ? "highlighted" : ""}
+          >
+            <span className="threadTitle">{thread.title}</span>
+            <i
+              className="fa-solid fa-trash"
+              title="Delete"
+              aria-hidden="true"
+              onClick={(e) => {
+                e.stopPropagation()
+                deleteThread(thread.threadId);
+              }}
+            ></i>
+          </li>
+        ))}
+      </ul>
 
-          {/* sign */}
-             
-            <div className="sign"></div>
-                <p>By Amrendera &hearts;</p>
+      {/* sign */}
+
+      <div className="sign"></div>
+      <p>By Amrendera Singh Tomar tomar.amrendera@outlook.com &hearts;</p>
     </section>
- )
+  );
 }
 
 export default Sidebar;

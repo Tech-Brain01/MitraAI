@@ -1,8 +1,18 @@
 .chats {
     max-width: 700px;
-    overflow-y: scroll;
-    padding: 8rem;
+    width: 100%;
+    flex: 1 1 auto; /* take available vertical space */
+    overflow-y: auto; /* scroll only when needed */
+    padding: 2rem 1rem 6rem; /* leave room for input */
+    margin: 0 auto; /* center within container */
+    box-sizing: border-box;
+    scroll-behavior: smooth; /* smooth to bottom */
 }
+
+/* Progressive enhancement for extra polish */
+@supports (overscroll-behavior: contain) { .chats { overscroll-behavior: contain; } }
+@supports (scrollbar-gutter: stable) { .chats { scrollbar-gutter: stable; } }
+@supports (scrollbar-width: thin) { .chats { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; } }
 
 .userDiv {
     display: flex;
@@ -11,22 +21,62 @@
 }
 
 .gptDiv {
-   text-align: left;
-   font-size: 0.9rem;
+    text-align: left;
+    font-size: 0.9rem;
 }
 
 .userMessage {
-    background-color: #323232;
+    background-color: var(--bubble-user);
     padding: 10px 20px;
-    border-radius: 14px;
-    margin-left: 15rem;
+    border-radius: var(--radius-lg);
+    margin-left: auto; /* push to right without fixed margin */
     max-width: 500px;
+    border: 1px solid rgba(255,103,31,0.25);
 }
 
 .hljs {
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
 }
 
 pre {
     white-space: pre-wrap;
 }
+
+/* Assistant bubble markdown container uses .gptDiv > ReactMarkdown */
+.gptDiv :where(p, pre, code) {
+    background: transparent;
+}
+
+.gptDiv p {
+    background-color: var(--bubble-assistant);
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(26,94,154,0.25);
+}
+
+/* WebKit scrollbars (ChatGPT-like, subtle and visible on hover) */
+.chats::-webkit-scrollbar { width: 10px; height: 10px; }
+.chats::-webkit-scrollbar-track { background: transparent; }
+.chats::-webkit-scrollbar-thumb {
+    background: transparent; /* hidden by default */
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: content-box; /* creates a slim thumb */
+}
+.chats:hover::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.28);
+}
+.chats:hover::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.4);
+}
+
+/* History list scrollbars match chat */
+@supports (scrollbar-width: thin) { .history { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; } }
+.history::-webkit-scrollbar { width: 10px; height: 10px; }
+.history::-webkit-scrollbar-track { background: transparent; }
+.history::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 6px;
+}
+.history::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }

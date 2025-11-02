@@ -1,5 +1,5 @@
 import "./Chat.css";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { Mycontext } from "./MyContext.jsx";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
@@ -8,6 +8,7 @@ import "highlight.js/styles/github-dark.css";
 function Chat() {
   const { newChat, prevChats, reply } = useContext(Mycontext);
   const [latestReply, setLatestReply] = useState(null);
+  const listRef = useRef(null);
 
   useEffect(() => {
     if (reply === null) {
@@ -28,11 +29,18 @@ function Chat() {
     }, 40);
   }, [prevChats, reply]);
 
+  // Auto-scroll like ChatGPT: follow new messages and typing
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [prevChats, latestReply]);
+
   return (
     <>
       {newChat && <h1>Start a New Chat</h1>}
 
-      <div className="chats">
+  <div className="chats" ref={listRef}>
         {Array.isArray(prevChats) &&
           prevChats.slice(0, -1).map(
             (

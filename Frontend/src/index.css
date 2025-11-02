@@ -1,0 +1,63 @@
+/* Design tokens for MitraAI – indigenous-inspired palette */
+:root {
+	/* Tricolour accents */
+	--saffron: #ff671f;
+	--indian-green: #046a38;
+	--ashoka-blue: #1a5e9a; /* peacock / Ashoka Chakra inspired */
+
+	/* App surfaces */
+	--bg-900: #0f1115; /* deep charcoal */
+	--bg-800: #151822;
+	--bg-700: #1d2230;
+
+	/* Text */
+	--text-100: #ececec;
+	--text-300: #b4b4b4;
+
+	/* Bubbles */
+	--bubble-user: #2b2f3a; /* tinted with saffron on border */
+	--bubble-assistant: #21293a; /* tinted with ashoka blue */
+
+	/* Borders & shadows */
+	--border: rgba(255, 255, 255, 0.12);
+	--shadow-soft: 0 10px 30px rgba(0,0,0,0.25);
+	--radius-lg: 14px;
+}
+
+html, body, #root {
+	height: 100%;
+}
+
+body {
+	background: var(--bg-900);
+	color: var(--text-100);
+	margin: 0;
+	font-family: Hind, Mukta, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+	/* Subtle geometric motif using layered gradients (jaali-inspired) */
+	background-image:
+		radial-gradient(ellipse at top left, rgba(26,94,154,0.08), transparent 50%),
+		radial-gradient(ellipse at bottom right, rgba(255,103,31,0.06), transparent 45%),
+		linear-gradient(transparent 0%, transparent 97%, rgba(255,255,255,0.05) 100%);
+	background-attachment: fixed;
+}
+
+/* Tricolour top bar accent */
+.top-accent {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: linear-gradient(90deg, var(--saffron), #ffffff, var(--indian-green));
+	z-index: 9999;
+}
+
+/* Utility */
+.visually-hidden {
+	position: absolute !important;
+	height: 1px; width: 1px;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+	white-space: nowrap; /* added line */
+}
+
