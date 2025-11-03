@@ -1,6 +1,6 @@
 import "./Sidebar.css";
-import { useContext, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useContext, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Mycontext } from "./MyContext.jsx";
 import { v1 as uuidv1 } from "uuid";
 import { apiFetch } from "./apiClient";
@@ -22,24 +22,22 @@ function Sidebar({ isMobileOpen, closeMobileMenu }) {
     setShowSandbox,
   } = useContext(Mycontext);
 
-  const getAllThreads = async () => {
+  const getAllThreads = useCallback(async () => {
     try {
       const res = await apiFetch("/thread");
       const filteredData = (res || []).map((thread) => ({
         threadId: thread.threadId,
         title: thread.title,
       }));
-      // console.log(filteredData);
       setAllThreads(filteredData);
-      // console.log(res);
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [setAllThreads]);
 
   useEffect(() => {
     getAllThreads();
-  }, [currThreadId]);
+  }, [currThreadId, getAllThreads]);
 
   const createNewChat = () => {
     setNewChat(true);
@@ -80,9 +78,7 @@ function Sidebar({ isMobileOpen, closeMobileMenu }) {
 
 const deleteThread = async (threadId) => {
   try {
-   const response = await apiFetch(`/thread/${threadId}`, {method: 'DELETE'});
-   const res = await response;
-  //  console.log(res);
+   await apiFetch(`/thread/${threadId}`, {method: 'DELETE'});
 
   setAllThreads(prev => prev.filter(thread => thread.threadId !== threadId));
   

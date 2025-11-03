@@ -15,14 +15,12 @@ function Chatwindow() {
   const {
     prompt,
     setPrompt,
-    reply,
     setReply,
     currThreadId,
     setPrevChats,
     setNewChat,
     showSandbox,
     setShowSandbox,
-    user,
     setUser,
     setIsAuthenticated,
   } = useContext(Mycontext);
@@ -50,7 +48,7 @@ function Chatwindow() {
       };
       loadThread();
     }
-  }, [threadId]);
+  }, [threadId, currThreadId, setNewChat, setPrevChats, setReply]);
 
   const simulateTyping = (text, callback) => {
     setIsTyping(true);

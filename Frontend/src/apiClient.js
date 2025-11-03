@@ -29,7 +29,7 @@ export async function apiFetch(path, options = {}) {
   if (text) {
     try {
       data = JSON.parse(text);
-    } catch (e) {
+    } catch {
       // Non-JSON response
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${text.slice(0, 300)}`);

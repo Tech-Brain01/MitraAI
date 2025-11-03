@@ -9,7 +9,7 @@ import { Mycontext } from './MyContext.jsx';
 import { useState, useEffect } from 'react';
 import { v1 as uuidv1} from 'uuid';
 import { Analytics } from '@vercel/analytics/react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
   const [prompt, setPrompt] = useState("");

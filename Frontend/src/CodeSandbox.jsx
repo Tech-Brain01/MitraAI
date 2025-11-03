@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import './CodeSandbox.css';
 
 const CodeSandbox = () => {
-  const { sandboxCode, setSandboxCode, sandboxLanguage, setSandboxLanguage } = useContext(Mycontext);
+  const { sandboxCode, setSandboxCode, sandboxLanguage } = useContext(Mycontext);
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
   const [output, setOutput] = useState('');

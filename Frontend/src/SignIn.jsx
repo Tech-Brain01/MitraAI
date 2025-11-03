@@ -1,5 +1,5 @@
 import React from "react";
-import { SignIn, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import { SignIn as ClerkSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 
 export default function SignIn() {
   return (
@@ -11,7 +11,7 @@ export default function SignIn() {
 
       <SignedOut>
     
-        <SignIn path="/sign-in" routing="path" />
+        <ClerkSignIn path="/sign-in" routing="path" />
       </SignedOut>
     </>
   );
