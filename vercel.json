@@ -1,4 +1,4 @@
-    `1q{
+{
   "buildCommand": "cd Frontend && npm ci && npm run build",
   "outputDirectory": "Frontend/dist",
   "installCommand": "cd Frontend && npm ci",
