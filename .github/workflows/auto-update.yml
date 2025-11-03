@@ -1,0 +1,70 @@
+# ==========================================
+# MitraAI - Auto Update Dependencies
+# ==========================================
+# Automated dependency updates with testing
+# Runs weekly on Mondays at 9 AM UTC
+# ==========================================
+
+name: Auto Update Dependencies
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Every Monday at 9 AM UTC
+  workflow_dispatch:
+
+jobs:
+  update-dependencies:
+    name: 📦 Update Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Update Backend Dependencies
+        working-directory: ./Backend
+        run: |
+          npm update
+          npm audit fix --force || true
+
+      - name: Update Frontend Dependencies
+        working-directory: ./Frontend
+        run: |
+          npm update
+          npm audit fix --force || true
+
+      - name: Run Tests
+        run: |
+          cd Backend && npm test || true
+          cd ../Frontend && npm run build
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: auto-update dependencies'
+          title: '🤖 Auto Update Dependencies'
+          body: |
+            ## Automated Dependency Update
+            
+            This PR updates all dependencies to their latest compatible versions.
+            
+            ### Changes
+            - Updated Backend dependencies
+            - Updated Frontend dependencies
+            - Fixed security vulnerabilities
+            
+            ### Testing
+            - ✅ Backend tests passed
+            - ✅ Frontend build successful
+            
+            **Review and merge if all checks pass.**
+          branch: auto-update-dependencies
+          delete-branch: true

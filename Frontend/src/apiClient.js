@@ -3,12 +3,24 @@ export const apiBase = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "
 
 export async function apiFetch(path, options = {}) {
   const urlPath = path.startsWith("/") ? path : `/${path}`;
+  
+  // Get token from localStorage
+  const token = localStorage.getItem("token");
+  
+  // Build headers with authentication
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+  };
+  
+  // Add Authorization header if token exists
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
   const res = await fetch(`${apiBase}${urlPath}`, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
+    headers,
   });
 
   // Read text first to handle empty/invalid JSON bodies gracefully
@@ -28,7 +40,9 @@ export async function apiFetch(path, options = {}) {
 
   if (!res.ok) {
     const message = (data && (data.error || data.message)) || `Request failed with status ${res.status}`;
-    throw new Error(message);
+    const error = new Error(message);
+    error.status = res.status;
+    throw error;
   }
 
   return data;

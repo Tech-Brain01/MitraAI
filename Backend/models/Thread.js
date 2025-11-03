@@ -19,8 +19,13 @@ const MessageSchema = new mongoose.Schema({
 const ThreadSchema = new mongoose.Schema({
     threadId: {
         type: String,
+        required: true
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
-        unique: true
+        index: true
     },
     title: {
         type: String,
@@ -36,5 +41,9 @@ const ThreadSchema = new mongoose.Schema({
         default: Date.now
     }
 });
+
+// Compound index for efficient user-specific thread queries
+ThreadSchema.index({ userId: 1, threadId: 1 }, { unique: true });
+ThreadSchema.index({ userId: 1, updatedAt: -1 });
 
 export default mongoose.model("Thread", ThreadSchema);

@@ -9,6 +9,14 @@
     scroll-behavior: smooth; /* smooth to bottom */
 }
 
+/* Mobile: Adjust padding */
+@media (max-width: 768px) {
+    .chats {
+        padding: 1rem 0.75rem 4rem;
+        max-width: 100%;
+    }
+}
+
 /* Progressive enhancement for extra polish */
 @supports (overscroll-behavior: contain) { .chats { overscroll-behavior: contain; } }
 @supports (scrollbar-gutter: stable) { .chats { scrollbar-gutter: stable; } }
@@ -23,6 +31,27 @@
 .gptDiv {
     text-align: left;
     font-size: 0.9rem;
+    position: relative;
+}
+
+/* Typing cursor animation */
+.gptDiv.typing .typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: var(--ashoka-blue);
+    margin-left: 2px;
+    animation: blink 1s infinite;
+    vertical-align: text-bottom;
+}
+
+@keyframes blink {
+    0%, 49% {
+        opacity: 1;
+    }
+    50%, 100% {
+        opacity: 0;
+    }
 }
 
 .userMessage {
@@ -32,6 +61,14 @@
     margin-left: auto; /* push to right without fixed margin */
     max-width: 500px;
     border: 1px solid rgba(255,103,31,0.25);
+}
+
+/* Mobile: Adjust message width */
+@media (max-width: 768px) {
+    .userMessage {
+        max-width: 85%;
+        padding: 8px 16px;
+    }
 }
 
 .hljs {
@@ -53,6 +90,14 @@ pre {
     padding: 10px 20px;
     border-radius: var(--radius-lg);
     border: 1px solid rgba(26,94,154,0.25);
+}
+
+/* Mobile: Adjust assistant message */
+@media (max-width: 768px) {
+    .gptDiv p {
+        padding: 8px 16px;
+        max-width: 85%;
+    }
 }
 
 /* WebKit scrollbars (ChatGPT-like, subtle and visible on hover) */

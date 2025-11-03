@@ -1,12 +1,15 @@
 import "./Sidebar.css";
 import { useContext, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Mycontext } from "./MyContext.jsx";
 import { v1 as uuidv1 } from "uuid";
 import { apiFetch } from "./apiClient";
 import logo from "./assets/logo.png";
+import ModelSelector from "./ModelSelector.jsx";
 
 
-function Sidebar() {
+function Sidebar({ isMobileOpen, closeMobileMenu }) {
+  const navigate = useNavigate();
   const {
     allThreads,
     setAllThreads,
@@ -16,6 +19,7 @@ function Sidebar() {
     setReply,
     setCurrThreadId,
     setPrevChats,
+    setShowSandbox,
   } = useContext(Mycontext);
 
   const getAllThreads = async () => {
@@ -41,12 +45,22 @@ function Sidebar() {
     setNewChat(true);
     setPrompt("");
     setReply(null);
-    setCurrThreadId(uuidv1());
+    const newThreadId = uuidv1();
+    setCurrThreadId(newThreadId);
     setPrevChats([]);
+    setShowSandbox(false); // Close sandbox when creating new chat
+    navigate('/chat'); // Navigate to /chat without thread ID
+    
+    // Close mobile menu after creating new chat
+    if (closeMobileMenu) {
+      closeMobileMenu();
+    }
   };
 
   const changeThread = async (newThreadId) => {
     setCurrThreadId(newThreadId);
+    setShowSandbox(false); // Close sandbox when switching threads
+    navigate(`/chat/${newThreadId}`); // Navigate to thread-specific URL
 
     try {
       const res = await apiFetch(`/thread/${newThreadId}`);
@@ -54,6 +68,11 @@ function Sidebar() {
       setPrevChats(res.messages || []);
       setNewChat(false);
       setReply(null);
+      
+      // Close mobile menu after selecting thread
+      if (closeMobileMenu) {
+        closeMobileMenu();
+      }
     } catch (err) {
       console.log(err);
     }
@@ -77,8 +96,11 @@ const deleteThread = async (threadId) => {
 }
 
   return (
-    <section className="sidebar">
-
+    <section className={`sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
+      {/* Model Selector */}
+      <div className="sidebar-model-selector">
+        <ModelSelector />
+      </div>
 
       {/* new chat button */}
       <button onClick={createNewChat}>

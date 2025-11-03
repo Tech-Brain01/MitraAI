@@ -1,40 +1,26 @@
 import "./Chat.css";
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Mycontext } from "./MyContext.jsx";
 import ReactMarkdown from "react-markdown";
-import rehypeHighlight from "rehype-highlight";
+import CodeBlock from "./CodeBlock.jsx";
 import "highlight.js/styles/github-dark.css";
 
 function Chat() {
-  const { newChat, prevChats, reply } = useContext(Mycontext);
-  const [latestReply, setLatestReply] = useState(null);
+  const { newChat, prevChats, reply, setShowSandbox, setSandboxCode, setSandboxLanguage } = useContext(Mycontext);
   const listRef = useRef(null);
 
-  useEffect(() => {
-    if (reply === null) {
-      setLatestReply(null);
-      return;
-    }
+  const handleRunCode = (code, language) => {
+    setShowSandbox(true);
+    setSandboxCode(code);
+    setSandboxLanguage(language);
+  };
 
-    if (!prevChats?.length) return;
-
-    const content = reply.split(" ");
-
-    let idx = 0;
-    const interval = setInterval(() => {
-      setLatestReply(content.slice(0, idx + 1).join(" "));
-
-      idx++;
-      if (idx >= content.length) clearInterval(interval);
-    }, 40);
-  }, [prevChats, reply]);
-
-  // Auto-scroll like ChatGPT: follow new messages and typing
+  // Auto-scroll like ChatGPT: follow new messages
   useEffect(() => {
     const el = listRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-  }, [prevChats, latestReply]);
+  }, [prevChats, reply]);
 
   return (
     <>
@@ -42,44 +28,66 @@ function Chat() {
 
   <div className="chats" ref={listRef}>
         {Array.isArray(prevChats) &&
-          prevChats.slice(0, -1).map(
-            (
-              chat,
-              idx // <--- Add Array.isArray() check
-            ) => (
-              <div
-                className={chat.role === "user" ? "userDiv" : "gptDiv"}
-                key={idx}
-              >
-                {chat.role === "user" ? (
-                  <p className="userMessage">{chat.content}</p>
-                ) : (
-                  <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                    {chat.content}
-                  </ReactMarkdown>
-                )}
-              </div>
-            )
-          )}
-
-        {prevChats.length > 0 && (
-          <>
-            {latestReply === null ? (
-              <div className="gptDiv" key={"non-typing"}>
-                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                  {prevChats[prevChats.length - 1].content}
+          prevChats.map((chat, idx) => (
+            <div
+              className={chat.role === "user" ? "userDiv" : "gptDiv"}
+              key={idx}
+            >
+              {chat.role === "user" ? (
+                <p className="userMessage">{chat.content}</p>
+              ) : (
+                <ReactMarkdown
+                  components={{
+                    code({ node, inline, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || '');
+                      return !inline && match ? (
+                        <CodeBlock
+                          language={match[1]}
+                          value={String(children).replace(/\n$/, '')}
+                          onRunCode={handleRunCode}
+                          {...props}
+                        />
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
+                    }
+                  }}
+                >
+                  {chat.content}
                 </ReactMarkdown>
-              </div>
-            ) : (
-              <div className="gptDiv" key={"typing"}>
-                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                  {latestReply}
-                </ReactMarkdown>
-              </div>
-            )}
-          </>
+              )}
+            </div>
+          ))}
+        
+        {/* Show typing animation for current reply */}
+        {reply && (
+          <div className="gptDiv typing">
+            <ReactMarkdown
+              components={{
+                code({ node, inline, className, children, ...props }) {
+                  const match = /language-(\w+)/.exec(className || '');
+                  return !inline && match ? (
+                    <CodeBlock
+                      language={match[1]}
+                      value={String(children).replace(/\n$/, '')}
+                      onRunCode={handleRunCode}
+                      {...props}
+                    />
+                  ) : (
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                  );
+                }
+              }}
+            >
+              {reply}
+            </ReactMarkdown>
+            <span className="typing-cursor"></span>
+          </div>
         )}
-
       </div>
     </>
   );

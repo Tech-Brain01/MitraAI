@@ -1,0 +1,433 @@
+/* Upgrade Overlay */
+.upgrade-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 1rem;
+  overflow-y: auto;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Upgrade Container */
+.upgrade-container {
+  width: 100%;
+  max-width: 1100px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+  animation: slideUp 0.25s ease-out;
+  padding: 1.75rem;
+  max-height: 95vh;
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Upgrade Header */
+.upgrade-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.upgrade-title {
+  text-align: center;
+  flex: 1;
+}
+
+.upgrade-title i {
+  font-size: 1.75rem;
+  color: #d97706;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.upgrade-title h2 {
+  font-size: 1.625rem;
+  font-weight: 700;
+  margin: 0 0 0.375rem 0;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.upgrade-title p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.upgrade-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  border: 1.5px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.upgrade-close:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+/* Plans Grid */
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Plan Card */
+.plan-card {
+  background: #fafafa;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.plan-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.plan-card.selected {
+  border-color: #d97706;
+  background: #fffbeb;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+}
+
+.plan-card.popular {
+  border-color: #d97706;
+  position: relative;
+}
+
+/* Popular Badge */
+.popular-badge {
+  position: absolute;
+  top: -10px;
+  right: 1rem;
+  background: #d97706;
+  color: white;
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+}
+
+/* Plan Icon */
+.plan-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.375rem;
+  color: white;
+  margin: 0 auto 0.875rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Plan Name */
+.plan-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  text-align: center;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.01em;
+}
+
+/* Plan Price */
+.plan-price {
+  text-align: center;
+  margin: 0 0 1rem 0;
+}
+
+.plan-price .price {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+.plan-price .period {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin-left: 0.25rem;
+  font-weight: 500;
+}
+
+/* Plan Features */
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+}
+
+.plan-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  color: #374151;
+  font-size: 0.8125rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.plan-features li:last-child {
+  border-bottom: none;
+}
+
+.plan-features li i {
+  color: #059669;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+/* Plan Button */
+.plan-button {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  transition: all 0.15s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.plan-button:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.plan-button:active {
+  transform: scale(0.98);
+}
+
+.plan-button.current {
+  background: #059669;
+  cursor: default;
+}
+
+.plan-button.current:hover {
+  transform: none;
+}
+
+.plan-button i {
+  font-size: 0.8125rem;
+}
+
+/* Upgrade Benefits */
+.upgrade-benefits {
+  margin-top: 1.75rem;
+  padding: 1.5rem;
+  background: #fafafa;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.upgrade-benefits h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.01em;
+}
+
+.upgrade-benefits h3 i {
+  color: #d97706;
+  font-size: 1.125rem;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.875rem;
+}
+
+.benefit-card {
+  background: #ffffff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.benefit-card:hover {
+  background: #fafafa;
+  border-color: #d1d5db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.benefit-card i {
+  font-size: 1.5rem;
+  color: #d97706;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.benefit-card h4 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.375rem 0;
+  letter-spacing: -0.01em;
+}
+
+.benefit-card p {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+  .upgrade-container {
+    padding: 1.5rem;
+    max-width: 95%;
+  }
+
+  .upgrade-title h2 {
+    font-size: 1.5rem;
+  }
+
+  .plans-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .upgrade-overlay {
+    padding: 0.75rem;
+  }
+
+  .upgrade-container {
+    padding: 1.25rem;
+    border-radius: 10px;
+  }
+
+  .upgrade-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .upgrade-title h2 {
+    font-size: 1.375rem;
+  }
+
+  .upgrade-title i {
+    font-size: 1.5rem;
+  }
+
+  .upgrade-title p {
+    font-size: 0.8125rem;
+  }
+
+  .upgrade-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+  }
+
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .upgrade-benefits {
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+  }
+
+  .upgrade-benefits h3 {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .upgrade-container {
+    padding: 1rem;
+  }
+
+  .upgrade-title h2 {
+    font-size: 1.25rem;
+  }
+
+  .upgrade-title i {
+    font-size: 1.375rem;
+  }
+
+  .plan-name {
+    font-size: 1.125rem;
+  }
+
+  .plan-price .price {
+    font-size: 1.75rem;
+  }
+
+  .benefit-card {
+    padding: 0.875rem;
+  }
+}

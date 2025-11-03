@@ -2,6 +2,17 @@ import express from "express";
 const router = express.Router();
 import Thread from "../models/Thread.js";
 import { getGeminiAPIResponseWithFallback } from "../utils/geminiai.js";
+import rateLimit from "express-rate-limit";
+import { authenticateUser } from "../middleware/authMiddleware.js";
+
+// Chat-specific rate limiter - 20 messages per minute
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20, // limit each IP to 20 chat requests per minute
+  message: { error: "Too many messages sent. Please slow down and try again in a minute." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 router.post("/test", async (req, res) => {
   try {
@@ -20,10 +31,10 @@ router.post("/test", async (req, res) => {
   }
 });
 
-// route to get all threads
-router.get("/thread", async (req, res) => {
+// route to get all threads for authenticated user
+router.get("/thread", authenticateUser, async (req, res) => {
   try {
-    const threads = await Thread.find({}).sort({ updatedAt: -1 });
+    const threads = await Thread.find({ userId: req.userId }).sort({ updatedAt: -1 });
     //descending order of updatedat
     res.json(threads);
   } catch (err) {
@@ -34,11 +45,11 @@ router.get("/thread", async (req, res) => {
   }
 });
 
-// route to get the thread with specific threadId
-router.get("/thread/:threadId", async (req, res) => {
+// route to get the thread with specific threadId for authenticated user
+router.get("/thread/:threadId", authenticateUser, async (req, res) => {
   const { threadId } = req.params;
   try {
-    const thread = await Thread.findOne({ threadId });
+    const thread = await Thread.findOne({ threadId, userId: req.userId });
     if (!thread) {
       return res.status(404).json({ error: "Thread not found." });
     }
@@ -51,11 +62,11 @@ router.get("/thread/:threadId", async (req, res) => {
   }
 });
 
-// route to delete the specific threadid
-router.delete("/thread/:threadId", async (req, res) => {
+// route to delete the specific threadid for authenticated user
+router.delete("/thread/:threadId", authenticateUser, async (req, res) => {
   const { threadId } = req.params;
   try {
-    const deletedThread = await Thread.findOneAndDelete({ threadId });
+    const deletedThread = await Thread.findOneAndDelete({ threadId, userId: req.userId });
     if (!deletedThread) {
       return res.status(404).json({ error: "Thread not found" });
     }
@@ -68,19 +79,20 @@ router.delete("/thread/:threadId", async (req, res) => {
   }
 });
 
-// route to post threads
-router.post("/chat", async (req, res) => {
+// route to post threads for authenticated user
+router.post("/chat", authenticateUser, chatLimiter, async (req, res) => {
   const { threadId, message } = req.body;
 
   if (!threadId || !message) {
     return res.status(400).json({ error: "missing required fields" });
   }
   try {
-    let thread = await Thread.findOne({ threadId });
+    let thread = await Thread.findOne({ threadId, userId: req.userId });
 
     if (!thread) {
       thread = new Thread({
         threadId,
+        userId: req.userId,
         title: message,
         messages: [{ role: "user", content: message }],
       });

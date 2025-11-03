@@ -1,0 +1,111 @@
+.code-block-wrapper {
+    margin: 1rem 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid rgba(26, 94, 154, 0.2);
+}
+
+.code-block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: rgba(26, 94, 154, 0.08);
+    border-bottom: 1px solid rgba(26, 94, 154, 0.2);
+}
+
+.code-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.run-code-button {
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.4);
+    color: #4caf50;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+    font-weight: 600;
+}
+
+.run-code-button:hover {
+    background: rgba(76, 175, 80, 0.25);
+    border-color: #4caf50;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.run-code-button i {
+    font-size: 0.75rem;
+}
+
+.code-language {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ashoka-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.copy-button {
+    background: transparent;
+    border: 1px solid rgba(26, 94, 154, 0.3);
+    color: var(--text-300);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+    background: rgba(26, 94, 154, 0.1);
+    border-color: var(--ashoka-blue);
+    color: var(--ashoka-blue);
+}
+
+.copy-button i {
+    font-size: 0.85rem;
+}
+
+.code-block-wrapper pre {
+    margin: 0;
+    padding: 1rem;
+    background: #0d1117;
+    overflow-x: auto;
+}
+
+.code-block-wrapper code {
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .code-block-wrapper pre {
+        padding: 0.75rem;
+    }
+    
+    .code-block-wrapper code {
+        font-size: 0.85rem;
+    }
+    
+    .code-block-header {
+        padding: 0.4rem 0.75rem;
+    }
+    
+    .copy-button {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
+    }
+}

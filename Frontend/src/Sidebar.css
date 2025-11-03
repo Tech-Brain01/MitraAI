@@ -8,6 +8,30 @@
     justify-content: space-between;
     box-shadow: var(--shadow-soft);
     overflow: hidden; /* prevent double scrollbars */
+    transition: transform 0.3s ease;
+}
+
+/* Model Selector Container */
+.sidebar-model-selector {
+    padding: 12px 10px 6px 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Mobile: Sidebar as drawer */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        z-index: 1000;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
 }
 
 button{

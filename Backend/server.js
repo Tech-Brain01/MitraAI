@@ -5,6 +5,9 @@ import { fileURLToPath } from "url";
 import cors from "cors";
 import mongoose from "mongoose";
 import chatRoutes from "./routes/chat.js";
+import executeRoutes from "./routes/execute.js";
+import authRoutes from "./routes/auth.js";
+import rateLimit from "express-rate-limit";
 
 // Resolve .env relative to this file so it works no matter where Node is started from
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +20,8 @@ const PORT = 8080;
 const allowedOrigins = [
   "https://mitra-ai-rho.vercel.app",
   process.env.FRONTEND_URL,
-  "http://localhost:5173"
+  "http://localhost:5173",
+  "http://localhost:5174"
 ];
 
 const corsOptions = {
@@ -30,10 +34,44 @@ const corsOptions = {
   }
 };
 
+// Global rate limiter - 100 requests per 15 minutes per IP
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: { error: "Too many requests from this IP, please try again later." },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Chat-specific rate limiter - 20 messages per minute
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20, // limit each IP to 20 chat requests per minute
+  message: { error: "Too many messages sent. Please slow down and try again in a minute." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(globalLimiter); // Apply to all routes
 
 app.use("/api", chatRoutes);
+app.use("/api/execute", executeRoutes);
+app.use("/api/auth", authRoutes);
+
+// Health check endpoint for Docker/K8s
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "healthy",
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+    environment: process.env.NODE_ENV || "development"
+  });
+});
+
+// Apply chat-specific limiter (will be used in routes)
+export { chatLimiter };
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

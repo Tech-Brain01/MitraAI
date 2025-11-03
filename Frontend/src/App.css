@@ -6,9 +6,74 @@
 body{
     margin:0;
     padding:0;
+    overflow: hidden; /* prevent body scroll on mobile */
 }
 
 .app{
     background-color: var(--bg-900);
     display: flex;
+    position: relative;
+}
+
+/* Mobile: Sidebar overlay */
+@media (max-width: 768px) {
+    .app {
+        flex-direction: column;
+    }
+}
+
+/* Hamburger Menu Button (Mobile Only) */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    background-color: var(--bg-800);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    color: var(--text-100);
+    font-size: 1.5rem;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-toggle:hover {
+    background-color: rgba(26,94,154,0.15);
+    border-color: var(--ashoka-blue);
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+}
+
+/* Mobile Overlay */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+
+.mobile-overlay.active {
+    display: block;
+}
+
+@media (min-width: 769px) {
+    .mobile-overlay {
+        display: none !important;
+    }
 }
