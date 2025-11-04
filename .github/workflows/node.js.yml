@@ -37,12 +37,10 @@ jobs:
         VITE_API_URL: ${{ Secrets.VITE_API_URL }}
 
     - name: Deploy Frontend to Vercel
-      run: |
-        cd ..
-        npx vercel --prod --token ${{ Secrets.VERCEL_TOKEN }} --yes
+      run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
       env:
-        VERCEL_ORG_ID: ${{ Secrets.VERCEL_ORG_ID }}
-        VERCEL_PROJECT_ID: ${{ Secrets.VERCEL_PROJECT_ID }}
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
   build_backend:
     runs-on: ubuntu-latest
