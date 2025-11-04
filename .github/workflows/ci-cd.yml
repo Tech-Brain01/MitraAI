@@ -248,14 +248,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: ./Frontend
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: ./Frontend
+        run: npm run build
+
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./Frontend  
-          vercel-args: '--prod'
+          working-directory: ./Frontend
+          vercel-args: '--prod --yes'
 
   # ==========================================
   # JOB 7: Deploy to Render (Backend)
@@ -267,9 +282,32 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
-      - name: Trigger Render Deployment
+      - name: Check Render webhook configuration
         run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "⚠️ RENDER_DEPLOY_HOOK_URL is not set. Skipping Render deployment."
+            echo "To enable Render deployment, add RENDER_DEPLOY_HOOK_URL to repository secrets."
+            exit 0
+          fi
+
+      - name: Trigger Render Deployment
+        if: secrets.RENDER_DEPLOY_HOOK_URL != ''
+        run: |
+          response=$(curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
+            -w "\n%{http_code}" \
+            -s)
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n-1)
+          
+          echo "HTTP Status: $http_code"
+          echo "Response: $body"
+          
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            echo "✅ Render deployment triggered successfully"
+          else
+            echo "❌ Render deployment failed with status code: $http_code"
+            exit 1
+          fi
 
   # ==========================================
   # JOB 8: Create Release & Tag
@@ -278,7 +316,11 @@ jobs:
     name: 📦 Create Release
     runs-on: ubuntu-latest
     needs: [deploy-vercel, deploy-render]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: |
+      always() && 
+      github.event_name == 'push' && 
+      github.ref == 'refs/heads/main' &&
+      (needs.deploy-vercel.result == 'success' || needs.deploy-render.result == 'success')
     
     permissions:
       contents: write
@@ -324,21 +366,35 @@ jobs:
     name: 📢 Notify on Failure
     runs-on: ubuntu-latest
     needs: [deploy-vercel, deploy-render]
-    if: failure() && github.ref == 'refs/heads/main'
+    if: |
+      always() && 
+      github.ref == 'refs/heads/main' &&
+      (needs.deploy-vercel.result == 'failure' || needs.deploy-render.result == 'failure')
     
     steps:
       - name: Create Issue on Failure
         uses: actions/github-script@v7
         with:
           script: |
+            const vercelStatus = '${{ needs.deploy-vercel.result }}';
+            const renderStatus = '${{ needs.deploy-render.result }}';
+            
+            let failedServices = [];
+            if (vercelStatus === 'failure') failedServices.push('Vercel (Frontend)');
+            if (renderStatus === 'failure') failedServices.push('Render (Backend)');
+            
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: '🚨 Deployment Failed - ' + new Date().toISOString(),
               body: '## Deployment Failure\n\n' +
+                    '**Failed Services:** ' + failedServices.join(', ') + '\n\n' +
                     'Workflow: ' + context.workflow + '\n' +
-                    'Run: ' + context.runId + '\n' +
+                    'Run: https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId + '\n' +
                     'Commit: ' + context.sha + '\n\n' +
+                    '### Status:\n' +
+                    '- Vercel: ' + vercelStatus + '\n' +
+                    '- Render: ' + renderStatus + '\n\n' +
                     'Please check the workflow logs and rollback if necessary.',
               labels: ['deployment', 'bug']
             })

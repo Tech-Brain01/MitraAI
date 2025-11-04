@@ -273,13 +273,39 @@ Delete a thread permanently.
 
 ## 🌍 Deployment
 
-### Frontend (Vercel)
+### CI/CD Pipeline (GitHub Actions)
+
+The project includes an automated CI/CD pipeline that runs on every push to `main`. The pipeline:
+- ✅ Runs linting and tests
+- 🐳 Builds and pushes Docker images to GitHub Container Registry
+- 🚀 Deploys Frontend to Vercel and Backend to Render
+- 📦 Creates GitHub releases automatically
+
+#### Required GitHub Secrets
+
+To enable automated deployments, add these secrets to your repository:
+**Settings → Secrets and variables → Actions → New repository secret**
+
+| Secret Name | Description | How to Get |
+|-------------|-------------|------------|
+| `VERCEL_TOKEN` | Vercel authentication token | [Vercel Dashboard](https://vercel.com/account/tokens) → Create Token |
+| `VERCEL_ORG_ID` | Your Vercel organization ID | Run `vercel link` in Frontend folder, check `.vercel/project.json` |
+| `VERCEL_PROJECT_ID` | Your Vercel project ID | Run `vercel link` in Frontend folder, check `.vercel/project.json` |
+| `RENDER_DEPLOY_HOOK_URL` | Render webhook URL (optional) | Render Dashboard → Service → Settings → Deploy Hook |
+
+**Note**: If you don't configure Render secrets, the pipeline will skip the Render deployment but continue with other jobs.
+
+---
+
+### Manual Deployment
+
+#### Frontend (Vercel)
 1. Connect GitHub repo to Vercel
 2. Set Root Directory: `Frontend`
 3. Add env var: `VITE_API_URL`
 4. Deploy
 
-### Backend (Render)
+#### Backend (Render)
 1. Create Web Service
 2. Build: `cd Backend && npm install`
 3. Start: `cd Backend && npm start`
