@@ -270,7 +270,7 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./Frontend
-          vercel-args: '--prod --yes'
+          vercel-args: '--prod'
 
   # ==========================================
   # JOB 7: Deploy to Render (Backend)
