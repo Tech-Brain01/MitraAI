@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { Mycontext } from './MyContext.jsx';
 import toast from 'react-hot-toast';
 import './CodeSandbox.css';
+import { apiFetch } from './apiClient.js';
 
 const CodeSandbox = () => {
   const { sandboxCode, setSandboxCode, sandboxLanguage } = useContext(Mycontext);
@@ -29,7 +30,7 @@ const CodeSandbox = () => {
     setOutput('');
 
     try {
-      const response = await fetch(`http://localhost:8080/api/execute/${language}`, {
+      const response = await apiFetch(`/execute/${language}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
