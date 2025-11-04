@@ -39,14 +39,12 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Copy custom nginx config (must be after copying from builder to ensure context is available)
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Create non-root user
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S nginx -u 1001 -G nginx && \
-    chown -R nginx:nginx /usr/share/nginx/html && \
+# Set proper permissions for nginx user (user already exists in nginx:alpine image)
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chown -R nginx:nginx /var/cache/nginx && \
     chown -R nginx:nginx /var/log/nginx && \
     touch /var/run/nginx.pid && \
-    chown -R nginx:nginx /var/run/nginx.pid
+    chown nginx:nginx /var/run/nginx.pid
 
 # Switch to non-root user
 USER nginx
