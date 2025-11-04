@@ -282,17 +282,16 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
-      - name: Check Render webhook configuration
+      - name: Trigger Render Deployment
         run: |
           if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
             echo "⚠️ RENDER_DEPLOY_HOOK_URL is not set. Skipping Render deployment."
             echo "To enable Render deployment, add RENDER_DEPLOY_HOOK_URL to repository secrets."
+            echo "✅ Continuing pipeline without Render deployment."
             exit 0
           fi
-
-      - name: Trigger Render Deployment
-        if: secrets.RENDER_DEPLOY_HOOK_URL != ''
-        run: |
+          
+          echo "🚀 Triggering Render deployment..."
           response=$(curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
             -w "\n%{http_code}" \
             -s)
