@@ -1,7 +1,3 @@
-# MitraAI - CI/CD Pipeline
-# Automated Testing, Building, Versioning & Deployment
-# Triggers: Push to main/develop, Pull Requests
-
 name: MitraAI CI/CD Pipeline
 
 on:
@@ -15,49 +11,24 @@ env:
   NODE_VERSION: '20'
   DOCKER_REGISTRY: ghcr.io
   IMAGE_NAME_BACKEND: ${{ github.repository }}/backend
-  IMAGE_NAME_FRONTEND: ${{ github.repository }}/frontend
 
 jobs:
-  # ==========================================
-  # JOB 1: Code Quality & Linting
-  # ==========================================
   lint:
     name: 🔍 Code Quality Check
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |
-            Backend/package-lock.json
-            Frontend/package-lock.json
+      - run: npm ci --prefix Backend
+      - run: npm ci --prefix Frontend
+      - run: npm run lint --prefix Frontend
 
-      - name: Install Backend Dependencies
-        working-directory: ./Backend
-        run: npm ci
-
-      - name: Install Frontend Dependencies
-        working-directory: ./Frontend
-        run: npm ci
-
-      - name: Lint Frontend
-        working-directory: ./Frontend
-        run: npm run lint
-
-  # ==========================================
-  # JOB 2: Backend Tests
-  # ==========================================
   test-backend:
     name: 🧪 Backend Tests
     runs-on: ubuntu-latest
     needs: lint
-    
     services:
       mongodb:
         image: mongo:7.0
@@ -66,334 +37,82 @@ jobs:
         env:
           MONGO_INITDB_ROOT_USERNAME: testuser
           MONGO_INITDB_ROOT_PASSWORD: testpass
-        options: >-
-          --health-cmd "echo 'db.runCommand(\"ping\").ok' | mongosh localhost:27017/test --quiet"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: Backend/package-lock.json
+      - run: npm ci --prefix Backend
+      - run: |
+          MONGO_URI=mongodb://testuser:testpass@localhost:27017/test?authSource=admin \
+          JWT_SECRET=test PORT=8080 \
+          node Backend/server.js & sleep 10
+      - run: npm test --prefix Backend
 
-      - name: Install Dependencies
-        working-directory: ./Backend
-        run: npm ci
-
-      - name: Start Backend Server
-        working-directory: ./Backend
-        env:
-          MONGO_URI: mongodb://testuser:testpass@localhost:27017/test?authSource=admin
-          JWT_SECRET: test-secret-key
-          PORT: 8080
-        run: |
-          node server.js &
-          sleep 10
-
-      - name: Run Tests
-        working-directory: ./Backend
-        run: npm test
-
-  # ==========================================
-  # JOB 3: Frontend Tests
-  # ==========================================
   test-frontend:
     name: 🧪 Frontend Tests
     runs-on: ubuntu-latest
     needs: lint
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: Frontend/package-lock.json
+      - run: npm ci --prefix Frontend
+      - run: npm run build --prefix Frontend
 
-      - name: Install Dependencies
-        working-directory: ./Frontend
-        run: npm ci
-
-      - name: Build Frontend
-        working-directory: ./Frontend
-        run: npm run build
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: Frontend/dist
-          retention-days: 7
-
-  # ==========================================
-  # JOB 4: Dependency Audit
-  # ==========================================
   security:
     name: 🔒 Security Audit
     runs-on: ubuntu-latest
     needs: [test-backend, test-frontend]
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - run: npm audit --production --prefix Backend || true
+      - run: npm audit --production --prefix Frontend || true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Audit Backend Dependencies
-        working-directory: ./Backend
-        run: |
-          npm audit --production || true
-          echo "Backend audit complete"
-
-      - name: Audit Frontend Dependencies
-        working-directory: ./Frontend
-        run: |
-          npm audit --production || true
-          echo "Frontend audit complete"
-
-  # ==========================================
-  # JOB 5: Build & Push Docker Images
-  # ==========================================
-  build-docker:
-    name: 🐳 Build Docker Images
+  build-backend-docker:
+    name: 🐳 Build Backend Docker Image
     runs-on: ubuntu-latest
     needs: [test-backend, test-frontend, security]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
-    
-    permissions:
-      contents: read
-      packages: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (Backend)
-        id: meta-backend
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{branch}}-
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-
-      - name: Build and push Backend image
+      - name: Build & Push Backend Image
         uses: docker/build-push-action@v5
         with:
           context: ./Backend
           file: ./Backend/Dockerfile
           push: true
-          tags: ${{ steps.meta-backend.outputs.tags }}
-          labels: ${{ steps.meta-backend.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/backend:latest
 
-      - name: Extract metadata (Frontend)
-        id: meta-frontend
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{branch}}-
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-
-      - name: Build and push Frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./Frontend
-          file: ./Frontend/Dockerfile
-          push: true
-          tags: ${{ steps.meta-frontend.outputs.tags }}
-          labels: ${{ steps.meta-frontend.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # ==========================================
-  # JOB 6: Deploy to Vercel (Frontend)
-  # ==========================================
   deploy-vercel:
     name: 🚀 Deploy Frontend to Vercel
     runs-on: ubuntu-latest
-    needs: build-docker
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+    needs: build-backend-docker
+    if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: Frontend/package-lock.json
-
-      - name: Install Dependencies
-        working-directory: ./Frontend
-        run: npm ci
-
-      - name: Build Frontend
-        working-directory: ./Frontend
-        run: npm run build
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
+      - uses: actions/checkout@v4
+      - uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./Frontend
-          vercel-args: '--prod'
+          vercel-args: '--prod --prebuilt'
 
-  # ==========================================
-  # JOB 7: Deploy to Render (Backend)
-  # ==========================================
   deploy-render:
     name: 🚀 Deploy Backend to Render
     runs-on: ubuntu-latest
-    needs: build-docker
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+    needs: build-backend-docker
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Trigger Render Deployment
-        run: |
-          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
-            echo "⚠️ RENDER_DEPLOY_HOOK_URL is not set. Skipping Render deployment."
-            echo "To enable Render deployment, add RENDER_DEPLOY_HOOK_URL to repository secrets."
-            echo "✅ Continuing pipeline without Render deployment."
-            exit 0
-          fi
-          
-          echo "🚀 Triggering Render deployment..."
-          response=$(curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
-            -w "\n%{http_code}" \
-            -s)
-          http_code=$(echo "$response" | tail -n1)
-          body=$(echo "$response" | head -n-1)
-          
-          echo "HTTP Status: $http_code"
-          echo "Response: $body"
-          
-          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
-            echo "✅ Render deployment triggered successfully"
-          else
-            echo "❌ Render deployment failed with status code: $http_code"
-            exit 1
-          fi
-
-  # ==========================================
-  # JOB 8: Create Release & Tag
-  # ==========================================
-  release:
-    name: 📦 Create Release
-    runs-on: ubuntu-latest
-    needs: [deploy-vercel, deploy-render]
-    if: |
-      always() && 
-      github.event_name == 'push' && 
-      github.ref == 'refs/heads/main' &&
-      (needs.deploy-vercel.result == 'success' || needs.deploy-render.result == 'success')
-    
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get version from package.json
-        id: version
-        run: |
-          VERSION=$(node -p "require('./Backend/package.json').version")
-          echo "version=v${VERSION}" >> $GITHUB_OUTPUT
-
-      - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          release_name: Release ${{ steps.version.outputs.version }}
-          body: |
-            ## 🎉 MitraAI Release ${{ steps.version.outputs.version }}
-            
-            ### What's Changed
-            - Automated deployment via CI/CD
-            - Docker images available at ghcr.io
-            
-            ### Deployments
-            - Frontend: https://mitra-ai-rho.vercel.app
-            - Backend: https://mitraai-backend.onrender.com
-            
-            **Full Changelog**: https://github.com/${{ github.repository }}/compare/previous-tag...${{ steps.version.outputs.version }}
-          draft: false
-          prerelease: false
-
-  # ==========================================
-  # JOB 9: Notify on Failure
-  # ==========================================
-  notify-failure:
-    name: 📢 Notify on Failure
-    runs-on: ubuntu-latest
-    needs: [deploy-vercel, deploy-render]
-    if: |
-      always() && 
-      github.ref == 'refs/heads/main' &&
-      (needs.deploy-vercel.result == 'failure' || needs.deploy-render.result == 'failure')
-    
-    steps:
-      - name: Create Issue on Failure
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const vercelStatus = '${{ needs.deploy-vercel.result }}';
-            const renderStatus = '${{ needs.deploy-render.result }}';
-            
-            let failedServices = [];
-            if (vercelStatus === 'failure') failedServices.push('Vercel (Frontend)');
-            if (renderStatus === 'failure') failedServices.push('Render (Backend)');
-            
-            github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: '🚨 Deployment Failed - ' + new Date().toISOString(),
-              body: '## Deployment Failure\n\n' +
-                    '**Failed Services:** ' + failedServices.join(', ') + '\n\n' +
-                    'Workflow: ' + context.workflow + '\n' +
-                    'Run: https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId + '\n' +
-                    'Commit: ' + context.sha + '\n\n' +
-                    '### Status:\n' +
-                    '- Vercel: ' + vercelStatus + '\n' +
-                    '- Render: ' + renderStatus + '\n\n' +
-                    'Please check the workflow logs and rollback if necessary.',
-              labels: ['deployment', 'bug']
-            })
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
