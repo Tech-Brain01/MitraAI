@@ -33,8 +33,9 @@ FROM nginx:1.27-alpine AS production
 # Install curl for health checks
 RUN apk add --no-cache curl
 
+
 # Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
