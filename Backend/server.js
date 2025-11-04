@@ -15,22 +15,29 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 
+// CORS configuration
+// Ensure production frontend origin(s) are included. Also supports local dev.
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URL, 
   "http://localhost:5173",
-  "http://localhost:5174"
+  "http://localhost:5174",
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
+    // Allow requests with no origin like mobile apps or curl requests
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.filter(Boolean).includes(origin)) {
+      return callback(null, true);
     }
-  }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false, // set to true if you ever use cookies
+  optionsSuccessStatus: 204,
 };
 
 // Global rate limiter - 100 requests per 15 minutes per IP
@@ -52,6 +59,8 @@ const chatLimiter = rateLimit({
 });
 
 app.use(cors(corsOptions));
+// Explicitly handle preflight for all routes
+app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use(globalLimiter); // Apply to all routes
 
@@ -73,7 +82,7 @@ app.get("/health", (req, res) => {
 export { chatLimiter };
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
   ConnectDB();
 });
 

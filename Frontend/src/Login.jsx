@@ -39,7 +39,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await apiFetch(`/auth/login`, {
+      const data = await apiFetch(`/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,20 +51,19 @@ const Login = () => {
         }),
       });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (data && data.success) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
         setIsAuthenticated(true);
         toast.success('Login successful! Welcome back 🎉');
       } else {
-        toast.error(data.message || 'Login failed');
+        toast.error((data && data.message) || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Network error. Please try again.');
+      const message = error?.message || 'Network error. Please try again.';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

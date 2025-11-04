@@ -54,7 +54,7 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const response = await apiFetch(`/auth/register`, {
+      const data = await apiFetch(`/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,20 +67,19 @@ const Register = () => {
         }),
       });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (data && data.success) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
         setIsAuthenticated(true);
         toast.success('Registration successful! Welcome to MitraAI 🎉');
       } else {
-        toast.error(data.message || 'Registration failed');
+        toast.error((data && data.message) || 'Registration failed');
       }
     } catch (error) {
       console.error('Register error:', error);
-      toast.error('Network error. Please try again.');
+      const message = error?.message || 'Network error. Please try again.';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

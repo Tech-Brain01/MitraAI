@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import './Auth.css';
+import { apiFetch } from './apiClient.js';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/forgot-password', {
+      const data = await apiFetch('/auth/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -22,17 +23,16 @@ const ForgotPassword = () => {
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (data && data.success) {
         setIsSubmitted(true);
         toast.success('Password reset link sent to your email!');
       } else {
-        toast.error(data.message || 'Failed to send reset link');
+        toast.error((data && data.message) || 'Failed to send reset link');
       }
     } catch (error) {
       console.error('Forgot password error:', error);
-      toast.error('Network error. Please try again.');
+      const message = error?.message || 'Network error. Please try again.';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
