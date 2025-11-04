@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Mycontext } from './MyContext.jsx';
 import toast from 'react-hot-toast';
 import './Auth.css';
+import { apiFetch } from './apiClient.js';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/register', {
+      const response = await apiFetch(`/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

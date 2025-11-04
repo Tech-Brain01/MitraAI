@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Mycontext } from './MyContext.jsx';
 import toast from 'react-hot-toast';
 import './Auth.css';
+import { apiFetch } from './apiClient.js';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      const response = await apiFetch(`/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

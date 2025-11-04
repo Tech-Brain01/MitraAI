@@ -2,11 +2,15 @@
 
 > **A production-grade, indigenous AI chat platform** built with modern web technologies, featuring persistent conversation threads, streaming-ready architecture, and a uniquely Indian design language.
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live-brightgreen)](https://mitra-ai-rho.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Demo-Live-brightgreen)](https://mitra-ai-pink.vercel.app)
 [![Backend](https://img.shields.io/badge/Backend-Express-blue)](https://expressjs.com/)
 [![Frontend](https://img.shields.io/badge/Frontend-React-61DAFB)](https://react.dev/)
 [![AI](https://img.shields.io/badge/AI-Gemini%202.5-purple)](https://ai.google.dev/)
 [![Database](https://img.shields.io/badge/Database-MongoDB-green)](https://www.mongodb.com/)
+
+🌐 **Production URLs**:
+- **Frontend**: https://mitra-ai-pink.vercel.app
+- **Backend API**: https://mitraai-backend.onrender.com/api
 
 ---
 
