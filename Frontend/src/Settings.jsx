@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { Mycontext } from './MyContext.jsx';
 import toast from 'react-hot-toast';
 import './Settings.css';
+import { apiFetch } from './apiClient.js';
 
 const Settings = ({ onClose }) => {
   const { user, setUser } = useContext(Mycontext);
@@ -41,17 +42,21 @@ const Settings = ({ onClose }) => {
         updateData.newPassword = formData.newPassword;
       }
 
-      const response = await fetch('http://localhost:8080/api/auth/update-profile', {
+      const data = await apiFetch('/auth/update-profile', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
         body: JSON.stringify(updateData),
       });
 
-      const data = await response.json();
-
+      if (data.success) {
+        setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        toast.success('Profile updated successfully!');
+        setFormData({ ...formData, currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        toast.error(data.message || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Update profile error:', error);
       if (data.success) {
         setUser(data.user);
         localStorage.setItem('user', JSON.stringify(data.user));

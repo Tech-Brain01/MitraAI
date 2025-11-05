@@ -38,7 +38,7 @@ const CodeSandbox = () => {
         body: JSON.stringify({ code }),
       });
 
-      const result = await response.json();
+      const result = await response;
 
       if (result.success) {
         const fullOutput = [
