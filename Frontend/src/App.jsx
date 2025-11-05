@@ -9,6 +9,7 @@ import { Mycontext } from './MyContext.jsx';
 import { useState, useEffect } from 'react';
 import { v1 as uuidv1} from 'uuid';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
@@ -120,6 +121,7 @@ function App() {
           </Routes>
         </Mycontext.Provider>
         <Analytics />
+          <SpeedInsights />
       </div>
     </Router>
   );
