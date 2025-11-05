@@ -14,7 +14,6 @@
 /* Model Selector Container */
 .sidebar-model-selector {
     padding: 12px 10px 6px 10px;
-    border-bottom: 1px solid var(--border);
 }
 
 /* Mobile: Sidebar as drawer */

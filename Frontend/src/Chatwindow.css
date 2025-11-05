@@ -19,19 +19,30 @@
 /* navbar */
 
 .navbar {
-    width: 100%;
+    width: inherit;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: linear-gradient(180deg, rgba(26,94,154,0.12), transparent);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid #2a2c31;
+}
+.sidebar-model-selector {
+    margin: 0.75rem 1rem;
+}
+
+/* Make sure the selector doesn't collide with navbar content on small screens */
+@media (max-width: 768px) {
+    .sidebar-model-selector .model-selector-trigger {
+        min-width: 160px;
+        height: 36px;
+        padding: 0 0.75rem;
+    }
 }
 
 .navbar-actions {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin: 1rem 2rem;
 }
 
 .sandbox-toggle {

@@ -50,7 +50,7 @@ function Chatwindow() {
     }
   }, [threadId, currThreadId, setNewChat, setPrevChats, setReply]);
 
-  const simulateTyping = (text, callback) => {
+  const simulateTyping = (text, onTick, onComplete) => {
     setIsTyping(true);
     let index = 0;
     const words = text.split(' ');
@@ -59,12 +59,13 @@ function Chatwindow() {
     const typeNextWord = () => {
       if (index < words.length) {
         currentText += (index > 0 ? ' ' : '') + words[index];
-        callback(currentText);
+        onTick(currentText);
         index++;
         // Random delay between 30-80ms for natural typing
         setTimeout(typeNextWord, Math.random() * 50 + 30);
       } else {
         setIsTyping(false);
+        if (onComplete) onComplete();
       }
     };
 
@@ -92,20 +93,31 @@ function Chatwindow() {
     try {
       const userMessage = prompt;
       setPrompt(""); // Clear input immediately after sending
-      
-      const res = await apiFetch("/chat", options);
-      const assistantText = res?.reply ?? "";
 
-      // Simulate typing effect for the response
-      simulateTyping(assistantText, (partialText) => {
-        setReply(partialText);
-      });
-
+      // Optimistically add only the user message first
       setPrevChats((prev) => [
         ...prev,
         { role: "user", content: userMessage },
-        { role: "assistant", content: assistantText },
       ]);
+
+      const res = await apiFetch("/chat", options);
+      const assistantText = res?.reply ?? "";
+
+      // Simulate typing effect for the response; when finished, commit assistant message
+      simulateTyping(
+        assistantText,
+        (partialText) => {
+          setReply(partialText);
+        },
+        () => {
+          // Move the fully-typed reply into the chat history and clear the typing bubble
+          setReply(null);
+          setPrevChats((prev) => [
+            ...prev,
+            { role: "assistant", content: assistantText },
+          ]);
+        }
+      );
     } catch (error) {
       setIsTyping(false);
       if (error.name === 'AbortError') {
@@ -180,7 +192,7 @@ function Chatwindow() {
       />
       <div className="navbar">
         <span>
-          MitraAi &nbsp; <i className="fa-solid fa-chevron-down"></i>
+          MitraAi &nbsp; 
         </span>
         <div className="navbar-actions">
           <button 

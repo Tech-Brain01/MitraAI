@@ -5,7 +5,7 @@ import { Mycontext } from "./MyContext.jsx";
 import { v1 as uuidv1 } from "uuid";
 import { apiFetch } from "./apiClient";
 import logo from "./assets/logo.png";
-import ModelSelector from "./ModelSelector.jsx";
+
 
 
 function Sidebar({ isMobileOpen, closeMobileMenu }) {
@@ -93,11 +93,7 @@ const deleteThread = async (threadId) => {
 
   return (
     <section className={`sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
-      {/* Model Selector */}
-      <div className="sidebar-model-selector">
-        <ModelSelector />
-      </div>
-
+    
       {/* new chat button */}
       <button onClick={createNewChat}>
         <img className="logo" src={logo} alt="MitraAI logo"></img>

@@ -216,6 +216,7 @@
 .code-output {
   width: 100%;
   min-height: 400px;
+  max-height: 400px; /* keep a fixed viewport like the editor */
   padding: 1rem;
   background: #0d1117;
   border: 1px solid rgba(26, 94, 154, 0.3);
@@ -224,10 +225,34 @@
   font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
   font-size: 0.9rem;
   line-height: 1.6;
-  overflow-x: auto;
+  overflow: auto; /* vertical + horizontal scrolling like the editor */
   white-space: pre-wrap;
   word-wrap: break-word;
   margin: 0;
+}
+
+/* Match scrollbars between editor and output */
+.code-editor::-webkit-scrollbar,
+.code-output::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.code-editor::-webkit-scrollbar-track,
+.code-output::-webkit-scrollbar-track {
+  background: #0b0f14;
+  border-radius: 8px;
+}
+
+.code-editor::-webkit-scrollbar-thumb,
+.code-output::-webkit-scrollbar-thumb {
+  background: rgba(88, 166, 255, 0.35);
+  border-radius: 8px;
+}
+
+.code-editor::-webkit-scrollbar-thumb:hover,
+.code-output::-webkit-scrollbar-thumb:hover {
+  background: rgba(88, 166, 255, 0.55);
 }
 
 /* Mobile responsive */
@@ -258,6 +283,7 @@
   .code-editor,
   .code-output {
     min-height: 250px;
+    max-height: 250px; /* keep mobile panes scrollable */
     font-size: 0.85rem;
   }
 
