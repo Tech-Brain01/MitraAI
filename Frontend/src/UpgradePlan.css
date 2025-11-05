@@ -105,6 +105,11 @@
   color: #dc2626;
 }
 
+.upgrade-close i {
+  font-size: 1.25rem;
+  color: #6b7280;
+}
+
 /* Plans Grid */
 .plans-grid {
   display: grid;
@@ -205,6 +210,7 @@
   list-style: none;
   padding: 0;
   margin: 0 0 1rem 0;
+  position: relative;
 }
 
 .plan-features li {
@@ -229,7 +235,10 @@
 
 /* Plan Button */
 .plan-button {
-  width: 100%;
+  position: absolute;
+  top: 466px;
+  right: 95px;
+  width: fit-content;
   padding: 0.625rem 1rem;
   border: none;
   border-radius: 6px;

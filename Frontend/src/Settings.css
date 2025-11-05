@@ -98,6 +98,11 @@
   color: #dc2626;
 }
 
+.settings-close i {
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
 /* Settings Tabs */
 .settings-tabs {
   display: flex;
@@ -126,6 +131,7 @@
 
 .settings-tab i {
   font-size: 0.875rem;
+  color: #33363c;
 }
 
 .settings-tab:hover {

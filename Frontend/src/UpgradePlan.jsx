@@ -11,7 +11,7 @@ const UpgradePlan = ({ onClose }) => {
     {
       id: 'free',
       name: 'Free',
-      price: '$0',
+      price: '₹0',
       period: 'forever',
       features: [
         'Basic AI assistance',
@@ -26,7 +26,7 @@ const UpgradePlan = ({ onClose }) => {
     {
       id: 'pro',
       name: 'Pro',
-      price: '$9.99',
+      price: '₹299',
       period: 'per month',
       features: [
         'Advanced AI models',
@@ -44,7 +44,7 @@ const UpgradePlan = ({ onClose }) => {
     {
       id: 'enterprise',
       name: 'Enterprise',
-      price: '$49.99',
+      price: '₹4,999',
       period: 'per month',
       features: [
         'Everything in Pro',
