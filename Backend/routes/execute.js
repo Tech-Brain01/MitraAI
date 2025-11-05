@@ -6,10 +6,42 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "url";
 import { authenticateUser } from "../middleware/authMiddleware.js";
+import { promisify } from "util";
 
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Small helper to check if a runtime exists on the server
+async function runtimeAvailable(checkCommand) {
+  try {
+    const { exec } = await import("child_process");
+    const execPromise = promisify(exec);
+    await execPromise(checkCommand, { timeout: 3000 });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Capability probe so the UI can show/hide languages gracefully
+router.get("/capabilities", authenticateUser, async (_req, res) => {
+  try {
+    const [hasPython, hasJava] = await Promise.all([
+      runtimeAvailable("python3 --version"),
+      runtimeAvailable("javac -version"),
+    ]);
+
+    res.json({
+      javascript: true,
+      python: hasPython,
+      java: hasJava,
+    });
+  } catch (e) {
+    // In worst case, only JS is guaranteed
+    res.json({ javascript: true, python: false, java: false });
+  }
+});
 
 // JavaScript execution with vm2 (secure sandbox)
 router.post("/javascript", authenticateUser, async (req, res) => {
@@ -111,6 +143,17 @@ router.post("/java", authenticateUser, async (req, res) => {
   const filePath = path.join(tempDir, fileName);
 
   try {
+    // Check if javac exists before proceeding
+    const hasJavac = await runtimeAvailable("javac -version");
+    if (!hasJavac) {
+      return res.json({
+        success: false,
+        error:
+          "Java (javac) is not installed on the server. Ask the admin to install a JDK or deploy the backend with a JDK-enabled image.",
+        output: "",
+      });
+    }
+
     // Create temp directory if it doesn't exist
     await fs.mkdir(tempDir, { recursive: true });
 
@@ -118,8 +161,7 @@ router.post("/java", authenticateUser, async (req, res) => {
     await fs.writeFile(filePath, code);
 
     // Compile Java code
-    const { exec } = await import("child_process");
-    const { promisify } = await import("util");
+  const { exec } = await import("child_process");
     const execPromise = promisify(exec);
 
     // Compile

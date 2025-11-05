@@ -10,6 +10,7 @@ const CodeSandbox = () => {
   const [language, setLanguage] = useState('javascript');
   const [output, setOutput] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
+  const [availableLanguages, setAvailableLanguages] = useState(['javascript', 'python', 'java']);
 
   // Sync with context when code is sent from chat
   useEffect(() => {
@@ -19,6 +20,32 @@ const CodeSandbox = () => {
       setSandboxCode(''); // Clear after loading
     }
   }, [sandboxCode, sandboxLanguage, setSandboxCode]);
+
+  // Fetch backend capabilities so we don't show languages that aren't supported on the server
+  useEffect(() => {
+    const fetchCapabilities = async () => {
+      try {
+        const caps = await apiFetch('/execute/capabilities');
+        const langs = [
+          caps.javascript && 'javascript',
+          caps.python && 'python',
+          caps.java && 'java',
+        ].filter(Boolean);
+        if (langs.length) {
+          setAvailableLanguages(langs);
+          if (!langs.includes(language)) {
+            setLanguage(langs[0]);
+            toast((t) => (
+              'Selected language is not available on server. Switched to ' + langs[0]
+            ));
+          }
+        }
+      } catch (e) {
+        // Ignore, keep defaults
+      }
+    };
+    fetchCapabilities();
+  }, []);
 
   const executeCode = async () => {
     if (!code.trim()) {
@@ -127,9 +154,11 @@ public class Main {
             onChange={(e) => setLanguage(e.target.value)}
             className="language-select"
           >
-            <option value="javascript">JavaScript</option>
-            <option value="python">Python</option>
-            <option value="java">Java</option>
+            {availableLanguages.map((lang) => (
+              <option key={lang} value={lang}>
+                {lang === 'javascript' ? 'JavaScript' : lang === 'python' ? 'Python' : 'Java'}
+              </option>
+            ))}
           </select>
           <button onClick={insertExample} className="example-btn">
             <i className="fa-solid fa-lightbulb"></i> Example
