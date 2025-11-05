@@ -5,13 +5,14 @@ import fs from "fs/promises";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "url";
+import { authenticateUser } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // JavaScript execution with vm2 (secure sandbox)
-router.post("/javascript", async (req, res) => {
+router.post("/javascript", authenticateUser, async (req, res) => {
   const { code } = req.body;
 
   if (!code) {
@@ -48,7 +49,7 @@ router.post("/javascript", async (req, res) => {
 });
 
 // Python execution (using temporary files)
-router.post("/python", async (req, res) => {
+router.post("/python", authenticateUser, async (req, res) => {
   const { code } = req.body;
 
   if (!code) {
@@ -97,7 +98,7 @@ router.post("/python", async (req, res) => {
 });
 
 // Java execution (compile and run)
-router.post("/java", async (req, res) => {
+router.post("/java", authenticateUser, async (req, res) => {
   const { code } = req.body;
 
   if (!code) {
