@@ -1,10 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('home');
+  const [heroTitle, setHeroTitle] = useState('');
+  const fullHeroTitle = 'Your Intelligent AI Assistant';
+
+  // Typing Effect Logic
+  useEffect(() => {
+    setHeroTitle(''); 
+    let i = 0;
+    const type = () => {
+      if (i < fullHeroTitle.length) {
+        setHeroTitle(fullHeroTitle.substring(0, i + 1));
+        i++;
+        setTimeout(type, 100); 
+      }
+    };
+    type();
+  }, []); 
+
+  useEffect(() => {
+    const ids = ['home', 'features', 'pricing', 'about'];
+    const sections = ids
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
+
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter(e => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible?.target?.id) {
+          setActiveSection(visible.target.id);
+        }
+      },
+      {
+        root: null,
+        threshold: [0.35, 0.5, 0.75],
+        rootMargin: '-60px 0px -40% 0px', 
+      }
+    );
+
+    sections.forEach(sec => observer.observe(sec));
+    return () => observer.disconnect();
+  }, []);
 
   const features = [
     {
@@ -94,14 +138,14 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="landing-hero">
+      <section id="home" className="landing-section landing-hero">
         <div className="landing-hero-content">
           <div className="landing-hero-badge">
             <i className="fas fa-star"></i>
-            <span>Made in India, Built for the World</span>
+            <span >Made in India, Built for the World</span>
           </div>
           <h1 className="landing-hero-title">
-            Your Intelligent AI Assistant
+            <span>{heroTitle}</span>
           </h1>
           <p className="landing-hero-subtitle">
             Experience the power of Indian AI technology. Get instant answers, creative content, 
@@ -130,6 +174,8 @@ const LandingPage = () => {
               <div className="landing-stat-label">Uptime</div>
             </div>
           </div>
+          
+          
         </div>
         <div className="landing-hero-illustration">
           <div className="landing-hero-card">
@@ -156,7 +202,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="landing-features">
+  <section id="features" className="landing-section landing-features">
         <div className="landing-section-header">
           <h2 className="landing-section-title">Powerful Features</h2>
           <p className="landing-section-subtitle">
@@ -177,7 +223,7 @@ const LandingPage = () => {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="landing-pricing">
+  <section id="pricing" className="landing-section landing-pricing">
         <div className="landing-section-header">
           <h2 className="landing-section-title">Simple, Transparent Pricing</h2>
           <p className="landing-section-subtitle">
@@ -187,7 +233,7 @@ const LandingPage = () => {
         <div className="landing-pricing-grid">
           <div className="landing-pricing-card">
             <div className="landing-pricing-header">
-              <div className="landing-pricing-icon" style={{ background: '#6b7280' }}>
+              <div className="landing-pricing-icon" style={{ background: 'var(--text-light)' }}>
                 <i className="fas fa-user"></i>
               </div>
               <h3 className="landing-pricing-title">Free</h3>
@@ -210,7 +256,7 @@ const LandingPage = () => {
           <div className="landing-pricing-card landing-pricing-card-popular">
             <div className="landing-pricing-badge">Most Popular</div>
             <div className="landing-pricing-header">
-              <div className="landing-pricing-icon" style={{ background: '#d97706' }}>
+              <div className="landing-pricing-icon" style={{ background: 'var(--primary)' }}>
                 <i className="fas fa-star"></i>
               </div>
               <h3 className="landing-pricing-title">Pro</h3>
@@ -233,7 +279,7 @@ const LandingPage = () => {
 
           <div className="landing-pricing-card">
             <div className="landing-pricing-header">
-              <div className="landing-pricing-icon" style={{ background: '#374151' }}>
+              <div className="landing-pricing-icon" style={{ background: 'var(--text-dark)' }}>
                 <i className="fas fa-building"></i>
               </div>
               <h3 className="landing-pricing-title">Enterprise</h3>
@@ -256,7 +302,7 @@ const LandingPage = () => {
       </section>
 
       {/* About Section */}
-      <section id="about" className="landing-about">
+  <section id="about" className="landing-section landing-about">
         <div className="landing-about-content">
           <div className="landing-about-text">
             <h2 className="landing-section-title">About MitraAI</h2>
@@ -313,12 +359,17 @@ const LandingPage = () => {
         <div className="landing-footer-content">
           <div className="landing-footer-brand">
             <div className="landing-logo">
-              <i className="fas fa-robot"></i>
+              <i className="fas fa-robot" aria-hidden="true"></i>
               <span>MitraAI</span>
             </div>
             <p className="landing-footer-tagline">
               Your intelligent AI assistant for the modern world
             </p>
+
+            <form className="landing-footer-newsletter" onSubmit={(e) => e.preventDefault()}>
+              <input type="email" placeholder="Enter your email" aria-label="Email" />
+              <button type="submit" className="landing-btn-primary">Subscribe</button>
+            </form>
           </div>
           <div className="landing-footer-links">
             <div className="landing-footer-column">
@@ -344,9 +395,22 @@ const LandingPage = () => {
         <div className="landing-footer-bottom">
           <p>&copy; 2025 MitraAI. All rights reserved.</p>
           <div className="landing-footer-social">
-            <a href="#twitter"><i className="fab fa-twitter"></i></a>
-            <a href="#linkedin"><i className="fab fa-linkedin"></i></a>
-            <a href="#github"><i className="fab fa-github"></i></a>
+            <a
+              href="https://www.linkedin.com/in/amrendera-tomar"
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="LinkedIn"
+            >
+              <i className="fab fa-linkedin"></i>
+            </a>
+            <a
+              href="https://github.com/Tech-Brain01/MitraAI"
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="GitHub"
+            >
+              <i className="fab fa-github"></i>
+            </a>
           </div>
         </div>
       </footer>

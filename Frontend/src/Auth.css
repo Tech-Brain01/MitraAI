@@ -77,6 +77,11 @@
   transform: translateX(-2px);
 }
 
+.auth-back-btn i{
+  font-size: 1rem;
+  color: #6b7280;
+}
+
 /* Auth Header */
 .auth-header {
   text-align: center;
@@ -123,6 +128,18 @@
   gap: 0.875rem;
 }
 
+/* Grid helper for grouping fields */
+.auth-grid {
+  display: grid;
+  gap: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  /* Expand container to allow 2 columns comfortably */
+  .auth-container { max-width: 640px; }
+  .auth-grid.two-col { grid-template-columns: 1fr 1fr; }
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -135,6 +152,12 @@
   font-weight: 600;
   letter-spacing: 0.005em;
   padding-left: 0.125rem;
+}
+
+.form-group i{
+  margin-right: 0.5rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
 }
 
 .form-group input {
@@ -179,33 +202,39 @@
 }
 
 .password-input-wrapper input {
-  padding-right: 2.75rem;
+  padding-right: 2.75rem; /* reserve space for the toggle button */
   width: 100%;
 }
 
 .password-toggle {
   position: absolute;
-  right: 0;
-  top: 50%;
+  top: 12px;
+  right: 0.5px;
   transform: translateY(-50%);
-  height: auto;
-  padding: 0.4rem 0.75rem;
+  width: 36px;               /* square hit area for perfect centering */
+  height: 36px;
+  padding: 0;                /* no extra vertical padding that shifts alignment */
   background: none;
   border: none;
   color: #9ca3af;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: color 0.15s, transform 0.15s, background 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 6px;
 }
 
 .password-toggle:hover {
   color: #d97706;
+  background: #fff7ed;
 }
 
 .password-toggle i {
-  font-size: 0.9375rem;
+  font-size: 1rem;
+  color: #9ca3af;
+  line-height: 1;            /* avoid vertical offset from font metrics */
+
 }
 
 /* Auth Submit Button */
@@ -305,6 +334,7 @@
 
 .auth-link-btn i {
   font-size: 0.75rem;
+  color: #92400e;
 }
 
 .auth-switch-btn {
@@ -332,6 +362,7 @@
 
 .auth-switch-btn i {
   font-size: 0.8125rem;
+  color: #373b42;
 }
 
 /* Success Message */
