@@ -31,7 +31,6 @@ const Settings = ({ onClose }) => {
     setIsLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
       const updateData = {
         username: formData.username,
         email: formData.email,
@@ -53,21 +52,14 @@ const Settings = ({ onClose }) => {
         toast.success('Profile updated successfully!');
         setFormData({ ...formData, currentPassword: '', newPassword: '', confirmPassword: '' });
       } else {
+        // This else block handles API errors where data.success is false
         toast.error(data.message || 'Failed to update profile');
       }
     } catch (error) {
+      // This catch block handles network errors or 500-level errors
       console.error('Update profile error:', error);
-      if (data.success) {
-        setUser(data.user);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        toast.success('Profile updated successfully!');
-        setFormData({ ...formData, currentPassword: '', newPassword: '', confirmPassword: '' });
-      } else {
-        toast.error(data.message || 'Failed to update profile');
-      }
-    } catch (error) {
-      console.error('Update profile error:', error);
-      toast.error('Network error. Please try again.');
+      // Use error.message, not data.message, as 'data' is not in scope here
+      toast.error(error.message || 'Network error. Please try again.');
     } finally {
       setIsLoading(false);
     }
